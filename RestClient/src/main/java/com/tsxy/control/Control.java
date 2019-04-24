@@ -91,20 +91,26 @@ public class Control {
 				}
 			//员工登录
 			case 2:
-				 int idsyy = 0;
+				Emp ob;
+				int idsyy=0;
 				while (true) {
 					Emp emp=new Emp();
 					int empid =this.ui.getInt("请输入员工账号：");
 					String epasswd = this.ui.getString("请输入员工密码：");
 					emp = this.service.findByIdEmp(empid);
-					idsyy=empid;
+					ob=emp;
 					if (epasswd.equals(emp.getEpasswd())&&emp.getEmpid()==empid) {
 						break;
 					}
 					System.out.println("账号密码输入错误！");
 					System.out.println("请重新输入：");
 				}
-				System.out.println("登录成功");
+				if ("经理".equals(ob.getPermission().getPername())) {
+					System.out.println("登录成功,欢迎经理"+ob.getEname()+"使用系统！");
+				}
+				if ("普通员工".equals(ob.getPermission().getPername())) {
+					System.out.println("登录成功,欢迎员工"+ob.getEname()+"使用系统！");
+				}
 				//员工界面
 				while (true) {
 					this.v.EmpJM();
