@@ -71,6 +71,8 @@ public class View {
 	//经理界面---菜品管理界面
 		public void MgrJMmenu() {
 			System.out.println("请进行菜品管理：");
+			
+			System.out.println("101、设置库存");
 			System.out.println("1、添加菜品");
 			System.out.println("2、删除菜品");
 			System.out.println("3、修改菜品");

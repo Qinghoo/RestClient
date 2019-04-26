@@ -71,7 +71,7 @@ public class excel {
 			System.out.println(k+"\t"+v);
 		}
 		try {
-			FileOutputStream output = new FileOutputStream("d:\\JAKARTA.xls");
+			FileOutputStream output = new FileOutputStream("d:\\XIAOLIANG.xls");
 			wb.write(output);
 			output.flush(); 
 			System.out.println("成功创建excel文件");
@@ -131,8 +131,8 @@ public class excel {
 	 sheet.createRow(i);
 	 HSSFRow sum=sheet.createRow(i+1);
 	 
-	 sum.createCell(0).setCellValue("总价：");
-	 sum.createCell(1).setCellValue(car.getSumPrice());;
+	 sum.createCell(1).setCellValue("总价：");
+	 sum.createCell(2).setCellValue(car.getSumPrice());;
 	 
 	 HSSFRow shou=sheet.createRow(i+2);
 	 shou.createCell(1).setCellValue("收钱");

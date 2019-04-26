@@ -125,7 +125,7 @@ public class ShoppingCar implements Serializable{
 		sb.append("购物车箱单：\n");
 		Set<Dish> dishs=dishMaps.keySet();
 		Iterator<Dish> it=dishs.iterator();
-		sb.append("\t数量\t菜品id\t菜名\t描述\t单价\t菜品种类\t总价\n");
+		sb.append("\t数量\t菜品id\t菜名\t单价\t菜品种类\t库存\t总价\n");
 		while (it.hasNext()) {
 			Dish k=it.next();
 			Integer v=dishMaps.get(k);

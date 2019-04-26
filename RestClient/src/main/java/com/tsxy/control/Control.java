@@ -98,6 +98,7 @@ public class Control {
 					int empid =this.ui.getInt("请输入员工账号：");
 					String epasswd = this.ui.getString("请输入员工密码：");
 					emp = this.service.findByIdEmp(empid);
+					idsyy=empid;
 					ob=emp;
 					if (epasswd.equals(emp.getEpasswd())&&emp.getEmpid()==empid) {
 						break;
@@ -143,7 +144,7 @@ public class Control {
 										for (DishType dishType : fadt) {
 											if (num==dishType.getDishtypeid()) {
 												List<Dish> fad = this.service.findAllDish();
-												System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+												System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 												for (Dish dish : fad) {
 													if (dish.getDishtype().getDishtypeid()==num) {
 														System.out.println(dish);
@@ -162,15 +163,23 @@ public class Control {
 										continue;
 									}
 									int num1 = this.ui.getInt("请输入点菜数量：");
+									
+									int parseInt = Integer.parseInt(d.getDishdepict());
+									int count=parseInt-num1;
+									if (count>=0) {
+										d.setDishdepict(String.valueOf(count));
+										service.changeDish(d);
+									}
 									car.addDish(d,num1);
 									String or = this.ui.getString("是否继续点菜？（y/n）");
 									if ("n".equals(or)) {
+										System.out.println("您已点菜完成！");
+										System.out.println("您的购物车内有以下菜品：");
+										car.print();
 										break;
 									}
 								}
-								System.out.println("您已点菜完成！");
-								System.out.println("您的购物车内有以下菜品：");
-								car.print();
+								//car.print();
 								break;
 							//删除购物车菜品
 							case 2:
@@ -185,6 +194,14 @@ public class Control {
 									}
 									int num1 = this.ui.getInt("请输入要删除的份数为：");
 									car.deleteDish(d,num1);
+									
+									int parseInt = Integer.parseInt(d.getDishdepict());
+									int count=parseInt+num1;
+									if (count>=0) {
+										d.setDishdepict(count+"");
+										service.changeDish(d);
+									}
+									
 									String or = this.ui.getString("是否继续删除？（y/n）");
 									if ("n".equals(or)) {
 										break;
@@ -201,14 +218,23 @@ public class Control {
 									int menuid = this.ui.getInt("请输入您要修改的菜ID:");
 									Dish fBID = this.service.findByIdDish(menuid);
 									int num101 = this.ui.getInt("请输入要减少的数量为：");
+									
 									car.deleteDish(fBID, num101);
+									
+									int parseInt = Integer.parseInt(fBID.getDishdepict());
+									int count=parseInt+num101;
+									if (count>=0) {
+										fBID.setDishdepict(count+"");
+										service.changeDish(fBID);
+									}
+									
 									System.out.println("您的购物车内有以下菜品：");
 									car.print();
 									String cai = this.ui.getString("修改成功，您减少了"+num101+"份菜品,需要再加菜嘛？（y/n）");
 									if ("y".equals(cai)) {
 										System.out.println("今天有以下菜色可供您选择：");
 										List<Dish> fAD1 = this.service.findAllDish();
-										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 										for (Dish dish : fAD1) {
 											System.out.println(dish);
 										}
@@ -220,10 +246,17 @@ public class Control {
 												continue;
 											}
 											int num01 = this.ui.getInt("请输入要添加的数量：");
+											int parseInt1 = Integer.parseInt(fBD.getDishdepict());
+											int count1=parseInt+num01;
+											if (count1>=0) {
+												fBD.setDishdepict(count1+"");
+												service.changeDish(fBD);
+											}
 											car.addDish(fBD, num01);
 											System.out.println("添加成功，您的购物车内有以下菜品：");
 											car.print();
 											String or=this.ui.getString("是否要继续添加？（y/n）");
+											
 											if ("n".equals(or)) {
 												break;
 											}
@@ -232,10 +265,7 @@ public class Control {
 									if ("n".equals(or)) {
 										break;
 									}
-									
-									
 								}
-								
 								break;
 							case 4:
 								System.out.println("您的购物车内有以下菜品：");
@@ -261,6 +291,7 @@ public class Control {
 									shouqian=shou;
 									if (shou<car.getSumPrice()) {
 										System.out.println("您输入的钱不足以支付！请重新输入：");
+										continue;
 									}
 									break;
 								}
@@ -272,16 +303,17 @@ public class Control {
 								System.out.println("唐山学院店");
 								car.setShouPrice(shouqian);
 								car.setRest("唐山学院店");
+								
 								car.setEmpId(idsyy);
 								car.printxiaopiao();
 								System.out.println("实收"+shouqian);
 								System.out.println("找零"+df.format(zhao));
+								this.service.addOrder(car);
 								String a=this.ui.getString("是否确认导出小票？（y/n）");
 								if ("y".equals(a)) {
 									excel.excelxiaopiao(car);
 									System.out.println("导出成功！");
 								}
-								this.service.addOrder(car);
 								break;
 							case 6:
 								break N;
@@ -611,6 +643,14 @@ public class Control {
 								int g=this.ui.getInt("请选择：");
 								switch (g) {
 								//添加菜品
+								case 101:
+									List<Dish> allDish = service.findAllDish();
+									for (Dish dish : allDish) {
+										System.out.println(dish);
+										dish.setDishdepict(this.ui.getString("请输入库存量"));
+										service.changeDish(dish);
+									}
+									break;
 								case 1:
 									while (true) {
 										Dish dish=new Dish();
@@ -623,7 +663,7 @@ public class Control {
 										dish.setDishid(id);
 										String name = this.ui.getString("请输入要添加的菜的名字：");
 										dish.setDishname(name);
-										String miaoshu=this.ui.getString("请输入要添加的菜品描述：");
+										String miaoshu=this.ui.getString("请输入要添加的库存量：");
 										dish.setDishdepict(miaoshu);
 										double price=this.ui.getDouble("请输入要添加的菜品的价格：");
 										dish.setDisprice(price);;
@@ -638,7 +678,7 @@ public class Control {
 										DishType findByIdDishType = this.service.findByIdDishType(dishtype);
 										dish.setDishtype(findByIdDishType);
 										System.out.println("您添加的菜品信息如下：");
-										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 										System.out.println(dish);
 										String j=this.ui.getString("确定添加嘛？（y/n）");
 										if ("y".equals(j)) {
@@ -664,7 +704,7 @@ public class Control {
 											continue;
 										}
 										System.out.println("您将要删除的菜品信息如下：");
-										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 										System.out.println(findByIdDish);
 										String or=this.ui.getString("确认删除该菜品吗？（y/n）");
 										if ("y".equals(or)) {
@@ -689,11 +729,11 @@ public class Control {
 											continue;
 										}
 										System.out.println("您想要更改的菜品信息如下：");
-										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 										System.out.println(dish);
 										String name=this.ui.getString("请输入更改后的菜品姓名：");
 										dish.setDishname(name);
-										String miaoshu=this.ui.getString("请输入更改后的菜品描述：");
+										String miaoshu=this.ui.getString("请输入更改后的库存量：");
 										dish.setDishdepict(miaoshu);
 										double price=this.ui.getDouble("请输入更改后的菜品的价格：");
 										dish.setDisprice(price);
@@ -708,7 +748,7 @@ public class Control {
 										DishType findByIdDishType = this.service.findByIdDishType(dishtype);
 										dish.setDishtype(findByIdDishType);
 										System.out.println("您更改后的菜品信息如下：");
-										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+										System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 										System.out.println(dish);
 										String j=this.ui.getString("确定更改嘛？（y/n）");
 										if ("y".equals(j)) {
@@ -733,7 +773,7 @@ public class Control {
 										int id=this.ui.getInt("3.根据菜品种类查询");
 										if (id==1) {
 											System.out.println("所有菜品信息如下：");
-											System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+											System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 											List<Dish> findAlldish = this.service.findAllDish();
 											for (Dish dish : findAlldish) {
 												System.out.println(dish);
@@ -746,7 +786,7 @@ public class Control {
 												System.out.println("输入错误，此菜品不存在！请重新输入：");
 												continue;
 											}
-											System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品描述");
+											System.out.println("id\t菜名\t菜品价格\t菜品种类\t菜品库存");
 											System.out.println(findByIdDish);
 										}
 										if (id==3) {
@@ -914,11 +954,11 @@ public class Control {
 								}
 								Dish dish = new Dish(int1,
 										this.ui.getString("请输入要设置的菜的名字："),
-										this.ui.getString("请输入要设置的菜品描述："),
+										this.ui.getString("请输入要设置的菜品库存："),
 										this.ui.getDouble("请输入要设置的菜品的价格："),
 										new DishType(3, "特价菜"),0);
 								System.out.println("您设置的菜品信息如下：");
-								System.out.println("id\t菜名\t价格\t菜品种类\t菜品描述");
+								System.out.println("id\t菜名\t价格\t菜品种类\t菜品库存");
 								System.out.println(dish);
 								String j=this.ui.getString("确定设置嘛？（y/n）");
 								if ("y".equals(j)) {
